@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirIQ - Admin Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+    <div class="logo">Air<span style="color:white">IQ</span></div>
+    <div class="nav-links">
+        <a href="{{ url_for('dashboard') }}">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Dashboard</span>
+        </a>
+        <a href="{{ url_for('submit') }}">
+            <span class="nav-icon">📍</span>
+            <span class="nav-label">Submit</span>
+        </a>
+        <a href="{{ url_for('predict') }}">
+            <span class="nav-icon">🤖</span>
+            <span class="nav-label">Predict</span>
+        </a>
+        <a href="{{ url_for('admin') }}" style="color:var(--accent)">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label">Admin</span>
+        </a>
+        <div class="nav-divider"></div>
+        <a href="{{ url_for('logout') }}">
+            <span class="nav-icon">🚪</span>
+            <span class="nav-label">Logout</span>
+        </a>
+        <div class="nav-divider"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span class="sun-icon">☀️ Light</span>
+            <span class="moon-icon">🌙 Dark</span>
+        </button>
+    </div>
+</nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h2>⚙️ Admin Panel</h2>
+        <p>Manage all community submissions and monitor platform activity.</p>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div style="max-width:900px; margin:20px auto; padding:0 40px">
+                {% for message in messages %}
+                    <div class="flash">✅ {{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Stats -->
+    <div class="dashboard-grid" style="max-width:900px; margin:0 auto">
+        <div class="stat-card">
+            <h3>Total Submissions</h3>
+            <p class="stat-number">{{ submissions|length }}</p>
+            <p class="stat-sub">all time</p>
+        </div>
+        <div class="stat-card">
+            <h3>Unique Users</h3>
+            <p class="stat-number">
+                {{ submissions | map(attribute=1) | unique | list | length }}
+            </p>
+            <p class="stat-sub">contributors</p>
+        </div>
+        <div class="stat-card">
+            <h3>Latest Entry</h3>
+            <p class="stat-number" style="font-size:18px">
+                {% if submissions %}
+                    {{ submissions[0][2] }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </p>
+            <p class="stat-sub">most recent location</p>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div style="max-width:900px; margin:24px auto; padding:0 40px">
+        <input type="text" id="search-input"
+            placeholder="🔍 Search by username or location..."
+            oninput="filterTable()"
+            style="width:100%; padding:12px 16px; border:1px solid var(--border);
+                   border-radius:10px; font-size:14px; background:var(--bg-card);
+                   color:var(--text-primary); outline:none;">
+    </div>
+
+    <!-- Submissions Table -->
+    <div class="table-container" style="max-width:900px; margin:0 auto 40px">
+        <h3>All Submissions</h3>
+        {% if submissions %}
+            <table class="data-table" id="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Location</th>
+                        <th>AQI Value</th>
+                        <th>Category</th>
+                        <th>Submitted At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in submissions %}
+                        <tr>
+                            <td style="color:var(--text-muted)">{{ row[0] }}</td>
+                            <td>
+                                <span style="background:var(--bg-secondary);
+                                    padding:4px 10px; border-radius:20px;
+                                    font-size:13px;">
+                                    {{ row[1] }}
+                                </span>
+                            </td>
+                            <td>{{ row[2] }}</td>
+                            <td>
+                                <strong>{{ row[3] }}</strong>
+                            </td>
+                            <td>
+                                {% if row[4] %}
+                                    <span class="aqi-badge badge-{{ row[4]|lower|replace(' ', '-') }}">
+                                        {{ row[4] }}
+                                    </span>
+                                {% else %}
+                                    <span style="color:var(--text-muted)">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td style="color:var(--text-muted); font-size:13px">
+                                {{ row[5] }}
+                            </td>
+                            <td>
+                                <form action="{{ url_for('delete_submission', submission_id=row[0]) }}" method="POST" onsubmit="return confirm('Delete this submission?')">
+                                    <button type="submit" class="btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="no-data">
+                <p>No submissions yet.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function filterTable() {
+            const input = document.getElementById('search-input').value.toLowerCase();
+            const rows = document.querySelectorAll('#admin-table tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
+        }
+    </script>
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-brand">
+            <div class="footer-logo">Air<span>IQ</span></div>
+            <p>Community-powered air quality monitoring and prediction for India.</p>
+        </div>
+        <div class="footer-links">
+            <h4>Navigation</h4>
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        </div>
+        <div class="footer-links">
+            <h4>Features</h4>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('submit') }}">Submit Reading</a>
+            <a href="{{ url_for('predict') }}">Predict AQI</a>
+        </div>
+        <div class="footer-info">
+            <h4>Project Info</h4>
+            <p>Air Quality Analysis & Forecasting</p>
+            <p>Real-time AQI insights and forecasting</p>
+            <p style="margin-top:8px; font-size:12px; color:var(--text-muted)">
+                Powered by LSTM + WAQI API
+            </p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 AirIQ — Built by Karthik</p>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:4px">
+            Data sourced from WAQI · Predictions by LSTM Neural Network
+        </p>
+    </div>
+</footer>
+</body>
+</html>

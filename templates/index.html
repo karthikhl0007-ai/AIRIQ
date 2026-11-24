@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirIQ - Air Quality Monitoring</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+</head>
+<body>
+
+   <!-- Navbar -->
+<nav class="navbar">
+    <div class="logo">Air<span style="color:white">IQ</span></div>
+    <div class="nav-links">
+        <a href="{{ url_for('home') }}">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </a>
+        <a href="{{ url_for('login') }}">
+            <span class="nav-icon">🔐</span>
+            <span class="nav-label">Login</span>
+        </a>
+        <a href="{{ url_for('register') }}">
+            <span class="nav-icon">✏️</span>
+            <span class="nav-label">Register</span>
+        </a>
+        <div class="nav-divider"></div>
+        <button class="theme-toggle" onclick="toggleTheme()">
+            <span class="sun-icon">☀️ Light</span>
+            <span class="moon-icon">🌙 Dark</span>
+        </button>
+    </div>
+</nav>
+
+    <!-- Hero -->
+    <div class="hero">
+        <h1>Know Your <span>Air</span></h1>
+        <p>Community-powered air quality monitoring and prediction for every neighbourhood in India.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('register') }}" class="btn-primary">Get Started</a>
+            <a href="{{ url_for('login') }}" class="btn-secondary">Login</a>
+        </div>
+
+        <!-- Live Stats Bar -->
+         <div class="stats-bar">
+            <div class="stats-bar-item">
+                <span class="stats-bar-number">{{ total_submissions }}</span>
+                <span class="stats-bar-label">Community Submissions</span>
+            </div>
+            <div class="stats-bar-divider"></div>
+            <div class="stats-bar-item">
+                <span class="stats-bar-number">{{ total_cities }}</span>
+                <span class="stats-bar-label">Locations Covered</span>
+            </div>
+            <div class="stats-bar-divider"></div>
+            <div class="stats-bar-item">
+                <span class="stats-bar-number">{{ total_users }}</span>
+                <span class="stats-bar-label">Registered Users</span>
+            </div>
+            <div class="stats-bar-divider"></div>
+            <div class="stats-bar-item">
+                <span class="stats-bar-number">{{ latest_aqi }}</span>
+                <span class="stats-bar-label">Latest AQI — {{ latest_location }}</span>
+            </div>
+        </div>
+
+        <!-- How it works -->
+         <div class="how-it-works">
+            <h2>How AirIQ Works</h2>
+            <p>Three simple steps to better air quality awareness</p>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">01</div>
+                    <div class="step-icon">📍</div>
+                    <h3>Submit</h3>
+                    <p>Register and submit AQI readings from your area. Every contribution helps build a more complete picture of India's air quality.</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                <div class="step-number">02</div>
+                <div class="step-icon">📊</div>
+                <h3>Monitor</h3>
+                <p>View real-time AQI values and historical trends on your dashboard. See how air quality changes over time in your area.</p>
+            </div>
+            <div class="step-arrow">→</div>
+            <div class="step">
+                <div class="step-number">03</div>
+                <div class="step-icon">🤖</div>
+                <h3>Predict</h3>
+                <p>Our LSTM model analyses 30 days of data to predict tomorrow's air quality — helping you plan your day with confidence.</p>
+            </div>
+        </div>
+    </div>
+
+        <!-- AQI Scale Visual -->
+        <div class="aqi-scale">
+            <div class="scale-item">
+                <div class="scale-dot" style="background:#22c55e"></div>
+                <span>Good</span>
+                <small>0-50</small>
+            </div>
+            <div class="scale-item">
+                <div class="scale-dot" style="background:#84cc16"></div>
+                <span>Satisfactory</span>
+                <small>51-100</small>
+            </div>
+            <div class="scale-item">
+                <div class="scale-dot" style="background:#f59e0b"></div>
+                <span>Moderate</span>
+                <small>101-200</small>
+            </div>
+            <div class="scale-item">
+                <div class="scale-dot" style="background:#f97316"></div>
+                <span>Poor</span>
+                <small>201-300</small>
+            </div>
+            <div class="scale-item">
+                <div class="scale-dot" style="background:#ef4444"></div>
+                <span>Very Poor</span>
+                <small>301-400</small>
+            </div>
+            <div class="scale-item">
+                <div class="scale-dot" style="background:#7c3aed"></div>
+                <span>Severe</span>
+                <small>401-500</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div style="max-width:600px; margin:20px auto; padding:0 20px;">
+                {% for message in messages %}
+                    <div class="flash">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Features -->
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon">📍</div>
+            <h3>Submit Readings</h3>
+            <p>Contribute AQI data from your area and help build a community-driven air quality map across India.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Live Dashboard</h3>
+            <p>View real-time AQI values and historical trends through interactive charts and graphs.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🤖</div>
+            <h3>AI Prediction</h3>
+            <p>Our LSTM deep learning model predicts tomorrow's air quality based on the past 30 days of data.</p>
+        </div>
+    </div>
+
+    <!-- AQI Info Section -->
+    <div class="info-section">
+        <div class="info-content">
+            <h2>What is AQI?</h2>
+            <p>The Air Quality Index (AQI) is a scale used to communicate how polluted the air is and what health effects might be a concern. India's AQI scale runs from 0 to 500 — the higher the number, the greater the health concern.</p>
+            <p style="margin-top:12px">AirIQ uses community-submitted readings combined with a trained LSTM neural network to give you both real-time and predicted air quality for your area.</p>
+            <a href="{{ url_for('register') }}" class="btn-primary" style="display:inline-block; margin-top:20px">Join the Community</a>
+        </div>
+        <div class="info-visual">
+            <div class="aqi-circle severe">
+                <span class="circle-value">350</span>
+                <span class="circle-label">Very Poor</span>
+            </div>
+            <div class="aqi-circle moderate" style="margin-left:-20px; margin-top:20px">
+                <span class="circle-value">142</span>
+                <span class="circle-label">Moderate</span>
+            </div>
+            <div class="aqi-circle good" style="margin-left:10px; margin-top:-10px">
+                <span class="circle-value">38</span>
+                <span class="circle-label">Good</span>
+            </div>
+        </div>
+    </div>
+    
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-brand">
+            <div class="footer-logo">Air<span>IQ</span></div>
+            <p>Community-powered air quality monitoring and prediction for India.</p>
+        </div>
+        <div class="footer-links">
+            <h4>Navigation</h4>
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('login') }}">Login</a>
+            <a href="{{ url_for('register') }}">Register</a>
+        </div>
+        <div class="footer-links">
+            <h4>Features</h4>
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('submit') }}">Submit Reading</a>
+            <a href="{{ url_for('predict') }}">Predict AQI</a>
+        </div>
+        <div class="footer-info">
+            <h4>Project Info</h4>
+            <p>Air Quality Analysis & Forecasting</p>
+            <p>Real-time AQI insights and forecasting</p>
+            <p style="margin-top:8px; font-size:12px; color:var(--text-muted)">
+                Powered by LSTM + WAQI API
+            </p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 AirIQ — Built by Karthik</p>
+        <p style="font-size:12px; color:var(--text-muted); margin-top:4px">
+            Data sourced from WAQI · Predictions by LSTM Neural Network
+        </p>
+    </div>
+</footer>
+</body>
+</html>
